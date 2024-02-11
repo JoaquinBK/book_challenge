@@ -1,0 +1,17 @@
+<%- include('partials/header.ejs') %>
+<h1>Create book </h1>
+
+<form action="/books/create" method="post">
+    <label for="">Book title</label>
+    <input type="text" name="book_title" required>
+
+    <label for="">Author name:</label>
+    <input type="text" name="author_name" required>
+  
+    <label for="">Description:</label>
+    <textarea name="description" required></textarea>
+
+    <button type="submit">Create Book</button>
+  </form>
+
+  <%- include('partials/footer.ejs') %>

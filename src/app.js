@@ -1,5 +1,6 @@
 const express = require('express');
 const mainRouter = require('./routes/main');
+const booksController = require('./controllers/booksController');
 
 const app = express();
 
@@ -11,9 +12,10 @@ app.set('views', 'src/views');
 
 app.use('/', mainRouter);
 
+app.use('/books', booksController);
 
-app.get('/books/:id'), (req, res) => {
-  
+
+app.get('/books/:id', (req, res) => {
   const bookId = req.params.id;
   const book = buscarLibroEnBaseDeDatos(bookId); 
 
@@ -22,7 +24,8 @@ app.get('/books/:id'), (req, res) => {
   } else {
     res.status(404).send('Libro no encontrado');
   }
-},
+});
+
 app.listen(3000, () => {
   console.log('listening in http://localhost:3000');
 });

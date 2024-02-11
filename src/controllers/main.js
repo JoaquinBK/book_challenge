@@ -10,11 +10,36 @@ const mainController = {
         res.render('home', { books });
       })
       .catch((error) => console.log(error));
+    },  
+    create: function(req, res) {
+      db.library.create({
+      product_name: req.body.product_name,
+      description: req.body.description,
+      image: req.file.filename,
+      date: req.body.date,
+      price: req.body.price
+    })
+    .then(function(result) {
+      return db.library.findAll();
+    })
+    .then(function(productos) {
+      res.render(path.join(__dirname, "../views/bookDetails"), { book, req });
+    })
+    .catch(function(error) {
+      console.error("Error al crear el producto:", error);
+      res.status(500).send("Error interno del servidor");
+    });
   },
   bookDetail: (req, res) => {
-    // Implement look for details in the database
-    res.render('bookDetail');
+    db.Book.findByPk(req.params.id, {
+      include: [{ association: 'authors' }]
+    })
+      .then((book) => {
+        res.render('bookDetail', { book });
+      })
+      .catch((error) => console.log(error));
   },
+
   bookSearch: (req, res) => {
     res.render('search', { books: [] });
   },
@@ -22,10 +47,35 @@ const mainController = {
     // Implement search by title
     res.render('search');
   },
-  deleteBook: (req, res) => {
-    // Implement delete book
-    res.render('home');
+  
+  updateBook: (req, res) => {
+    db.Book.update(
+      {
+        
+        title: req.body.title,
+        // Update other fields as needed
+      },
+      {
+        where: { id: req.params.id }
+      }
+    )
+      .then(() => {
+        res.redirect('/');
+      })
+      .catch((error) => console.log(error));
   },
+  
+  deleteBook: (req, res) => {
+    db.Book.destroy({
+      where: { id: req.params.id }
+    })
+      .then(() => {
+        res.redirect('/');
+      })
+      .catch((error) => console.log(error));
+  },
+  
+  
   authors: (req, res) => {
     db.Author.findAll()
       .then((authors) => {

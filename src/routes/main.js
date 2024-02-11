@@ -1,6 +1,6 @@
 const express = require('express');
 const mainController = require('../controllers/main');
-
+const booksController = require ('../controllers/booksController')
 const router = express.Router();
 
 router.get('/', mainController.home);
@@ -16,5 +16,8 @@ router.post('/users/login', mainController.processLogin);
 router.delete('/books/:id', mainController.deleteBook);
 router.get('/books/edit/:id', mainController.edit);
 router.put('/books/edit/:id', mainController.processEdit);
+
+router.get("/crear", booksController.crear)
+router.post ("/crear", booksController.save)
 
 module.exports = router;
