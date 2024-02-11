@@ -14,6 +14,19 @@
     <%- include('partials/header.ejs') %>
 
     <div class="container">
+      <!-- <form action="create" method="post" enctype="multipart/form-data">
+        
+        <label for="product_name">Product Name:</label>
+        <input type="text" name="product_name" required>
+
+        <label for="author_name">Author name:</label>
+        <input type="text" name="author_name" required>
+      
+        <label for="description">Description:</label>
+        <textarea name="description" required></textarea>
+      
+        <button type="submit" class="btn btn-primary">Create Book</button>
+      </form> -->
       <div class="list-group">
         <% {books.map((book) => { %>
           <a href="/books/detail/<%= book.id %>" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
