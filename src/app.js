@@ -1,6 +1,5 @@
 const express = require('express');
 const mainRouter = require('./routes/main');
-const booksController = require('./controllers/booksController');
 
 const app = express();
 
@@ -11,9 +10,6 @@ app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
 app.use('/', mainRouter);
-
-app.use('/books', booksController);
-
 
 app.get('/books/:id', (req, res) => {
   const bookId = req.params.id;
