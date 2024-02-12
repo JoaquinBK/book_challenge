@@ -26,51 +26,57 @@ const mainController = {
       .catch((error) => console.log(error));
   },
     //guardado del libro creado
-    save: function(req, res) {
-      db.library.create({
-      product_name: req.body.product_name,
-      description: req.body.description,
-      image: req.file.filename,
-      date: req.body.date,
-      price: req.body.price
+  save: function(req, res) {
+    const Book = db.Book;
+    const Author = db.Author;
+  
+    let bookData = {
+      title: req.body.book_title,
+        description: req.body.description
+    };  
+    let createdBook;
+  
+    Book.create(bookData)
+    .then(function(book) {
+      createdBook = book;
+      return Author.findOrCreate({
+        where: { name: req.body.author_name }
+      });
     })
-    .then(function(result) {
-      return db.library.findAll();
-    })
-    .then(function(productos) {
-      res.render(path.join(__dirname, "../views/bookDetails"), { book, req });
-    })
-    .catch(function(error) {
-      console.error("Error al crear el producto:", error);
-      res.status(500).send("Error interno del servidor");
-    });
+      .then(function([author, created]) {
+          return createdBook.addAuthor(author);
+      })
+      .then(function() {
+          return Book.findAll();
+      })
+      .then(function(books) {
+          res.redirect("/");
+      })
+      .catch(function(error) {
+          console.error("Error al crear el libro:", error);
+          res.status(500).send("Error interno del servidor");
+      });
   },
-  // updateBook: (req, res) => {
-  //   db.Book.update(
-  //     {
-        
-  //       title: req.body.title,
-  //       // Update other fields as needed
-  //     },
-  //     {
-  //       where: { id: req.params.id }
-  //     }
-  //   )
-  //     .then(() => {
-  //       res.redirect('/');
-  //     })
-  //     .catch((error) => console.log(error));
-  // },
     //edicion de libros
-    edit: (req, res) => {
-      // Implement edit book
-      res.render('editBook', {id: req.params.id})
+    edit: async (req, res) => {
+      let findBook = await db.Book.findByPk(req.params.id)
+      console.log(findBook);
+      res.render('editBook', {findBook})
     },
-    processEdit: (req, res) => {
-      // Implement edit book
-      res.render('home');
+    update: async (req, res) => {
+      try {
+        let updateBook = await db.Book.findByPk(req.params.id);
+        await updateBook.update({
+          title: req.body.title,
+          cover: req.body.cover,
+          description: req.body.description
+        });
+        res.redirect('/')
+      } catch (error) {
+        console.error("Error al procesar la edición del libro:", error);
+        res.status(500).send("Error interno del servidor");
+      }
     },
-    //busqueda de libros
   bookSearch: (req, res) => {
     res.render('search', { books: [] });
   },
@@ -79,16 +85,57 @@ const mainController = {
     res.render('search');
   },
   //borrado de libros
-  deleteBook: (req, res) => {
-    db.Book.destroy({
-      where: { id: req.params.id }
-    })
-      .then(() => {
-        res.redirect('/');
+  // deleteBook: (req, res) => {
+  //   db.Book.destroy({
+  //     where: { id: req.params.id }
+  //   })
+  //     .then(() => {
+  //       res.redirect('/');
+  //     })
+  //     .catch((error) => console.log(error));
+  // },
+//   deleteBook: async (req, res) => {
+//     try {
+//         // Eliminar las relaciones del libro con los autores
+//         await db.Book.findByPk(req.params.id)
+//             .then(book => {
+//                 if (!book) throw new Error('Libro no encontrado');
+//                 return book.removeAuthors();
+//             });
+
+//         // Eliminar el libro
+//         await db.Book.destroy({
+//             where: { id: req.params.id }
+//         });
+
+//         res.redirect('/');
+//     } catch (error) {
+//         console.error("Error al eliminar el libro:", error);
+//         res.status(500).send("Error interno del servidor");
+//     }
+// },
+deleteBook: async (req, res) => {
+  try {
+      // Eliminar las relaciones del libro con los autores en la tabla intermedia
+      let test = await db.Book.findByPk(req.params.id, {
+        include: [{ association: 'authors' }]
       })
-      .catch((error) => console.log(error));
-  },
-  
+      console.log(test);
+      // await db.BooksAuthors.destroy({
+      //     where: { BookId: req.params.id }
+      // });
+
+      // // Eliminar el libro
+      // await db.Book.destroy({
+      //     where: { id: req.params.id }
+      // });
+
+      res.redirect('/');
+  } catch (error) {
+      console.error("Error al eliminar el libro:", error);
+      res.status(500).send("Error interno del servidor");
+  }
+},
   //lista de autores
   authors: (req, res) => {
     db.Author.findAll()

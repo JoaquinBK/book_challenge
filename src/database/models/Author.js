@@ -10,7 +10,8 @@ module.exports = (sequelize, dataTypes) => {
       type: dataTypes.STRING
     },
     country: {
-      type: dataTypes.STRING
+      type: dataTypes.STRING,
+      defaultValue: 'Unknown'
     }
   };
   let config = {
@@ -24,7 +25,7 @@ module.exports = (sequelize, dataTypes) => {
     Author.belongsToMany(models.Book, {
       as: 'books',
       through: 'BooksAuthors',
-      foreingKey: 'AuthorId',
+      foreignKey: 'AuthorId',
       otherKey: 'BookId',
       timestamps: false
     });
