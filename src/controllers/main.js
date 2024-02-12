@@ -116,29 +116,28 @@ const mainController = {
 // },
 deleteBook: async (req, res) => {
   try {
-      // Eliminar las relaciones del libro con los autores en la tabla intermedia
-      let test = await db.Book.findByPk(req.params.id, {
-        include: [{ association: 'authors' }]
-      })
-      console.log(test);
-      if (!book) {
-        throw new Error('Libro no encontrado');
-      }
-  
-      await book.removeAuthors();
-  
-      console.log("Deleting book:", book);
+    // Buscar el libro por ID
+    let Book = await db.Book.findByPk(req.params.id, {
+      // include: [{ association: 'authors' }]
+    });
 
-      await book.destroy();
-  
-      console.log("Book deleted successfully");
-  
-      res.redirect('/');
-    } catch (error) {
-      console.error("Error al eliminar el libro:", error);
-      res.status(500).send("Error interno del servidor");
+    // Verificar si el libro existe
+    if (!Book) {
+      throw new Error('Libro no encontrado');
     }
-  },
+
+    // Eliminar las relaciones del libro con los autores en la tabla intermedia
+    // await Book.removeAuthors();
+
+    // Eliminar el libro
+    await Book.destroy();
+
+    res.redirect('/');
+  } catch (error) {
+    console.error("Error al eliminar el libro:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+},
   //lista de autores
   authors: (req, res) => {
     db.Author.findAll()
