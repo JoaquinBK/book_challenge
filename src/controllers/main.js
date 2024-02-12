@@ -115,10 +115,11 @@ const mainController = {
 //     }
 // },
 deleteBook: async (req, res) => {
+  const { id } = req.params;
   try {
     // Buscar el libro por ID
-    let Book = await db.Book.findByPk(req.params.id, {
-      // include: [{ association: 'authors' }]
+    let Book = await db.Book.findByPk(id, {
+      include: [{ association: 'authors' }]
     });
 
     // Verificar si el libro existe
@@ -127,7 +128,7 @@ deleteBook: async (req, res) => {
     }
 
     // Eliminar las relaciones del libro con los autores en la tabla intermedia
-    // await Book.removeAuthors();
+    await Book.removeAuthors();
 
     // Eliminar el libro
     await Book.destroy();
