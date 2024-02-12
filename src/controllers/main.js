@@ -121,21 +121,24 @@ deleteBook: async (req, res) => {
         include: [{ association: 'authors' }]
       })
       console.log(test);
-      // await db.BooksAuthors.destroy({
-      //     where: { BookId: req.params.id }
-      // });
+      if (!book) {
+        throw new Error('Libro no encontrado');
+      }
+  
+      await book.removeAuthors();
+  
+      console.log("Deleting book:", book);
 
-      // // Eliminar el libro
-      // await db.Book.destroy({
-      //     where: { id: req.params.id }
-      // });
-
+      await book.destroy();
+  
+      console.log("Book deleted successfully");
+  
       res.redirect('/');
-  } catch (error) {
+    } catch (error) {
       console.error("Error al eliminar el libro:", error);
       res.status(500).send("Error interno del servidor");
-  }
-},
+    }
+  },
   //lista de autores
   authors: (req, res) => {
     db.Author.findAll()
